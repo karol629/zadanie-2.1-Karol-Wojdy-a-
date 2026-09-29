@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KeyForge — Zaawansowany & Bezpieczny Generator Haseł</title>
+  <meta name="description" content="Nowoczesny, bezpieczny generator haseł o wysokiej entropii z obsługą symboli specjalnych, cyfr i liter. Pełne bezpieczeństwo po stronie przeglądarki.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient background lighting effects -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+  <div class="glow-orb orb-3"></div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-wrapper">
+        <div class="logo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <h1>Key<span>Forge</span></h1>
+          <span class="badge badge-security">100% Client-Side Crypto</span>
+        </div>
+      </div>
+      <p class="subtitle">Twórz nieprzeniknione, pancerne hasła z pełną kontrolą nad każdym znakiem.</p>
+    </header>
+
+    <!-- Main Card -->
+    <main class="card generator-card">
+      <!-- Mode Switcher Tabs -->
+      <div class="tabs-container">
+        <button type="button" id="tab-random" class="tab-btn active" data-mode="random">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"></path>
+            <path d="m14 7 3 3"></path>
+            <path d="M5 6v4"></path>
+            <path d="M19 14v4"></path>
+            <path d="M10 2v2"></path>
+            <path d="M7 8H3"></path>
+            <path d="M21 16h-4"></path>
+            <path d="M11 3H9"></path>
+          </svg>
+          Złożone znaki (Polecane)
+        </button>
+        <button type="button" id="tab-passphrase" class="tab-btn" data-mode="passphrase">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+            <path d="M6 6h10"></path>
+            <path d="M6 10h10"></path>
+          </svg>
+          Fraza słowna (Passphrase)
+        </button>
+      </div>
+
+      <!-- Result Screen -->
+      <div class="result-box">
+        <div class="result-header">
+          <span class="result-label">Wygenerowane hasło</span>
+          <div class="result-actions-top">
+            <button type="button" id="toggle-visibility-btn" class="icon-action-btn" title="Pokaż / Ukryj hasło" aria-label="Przełącz widoczność hasła">
+              <svg id="eye-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+            <button type="button" id="toggle-history-btn" class="icon-action-btn" title="Historia haseł" aria-label="Otwórz historię haseł">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+                <path d="M12 7v5l4 2"></path>
+              </svg>
+              <span id="history-counter" class="history-badge">0</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="password-display-wrapper">
+          <div id="password-display" class="password-display" tabindex="0" title="Kliknij, aby zaznaczyć">
+            <span class="placeholder">Kliknij Generuj, aby rozpocząć...</span>
+          </div>
+          
+          <div class="display-buttons">
+            <button type="button" id="refresh-btn" class="btn-icon-primary" title="Generuj nowe hasło (Spacja)" aria-label="Generuj nowe hasło">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                <path d="M3 3v5h5"></path>
+                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"></path>
+                <path d="M16 21h5v-5"></path>
+              </svg>
+            </button>
+            <button type="button" id="copy-btn" class="btn-copy" aria-label="Kopiuj hasło do schowka">
+              <svg class="copy-default" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+              </svg>
+              <svg class="copy-success" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span id="copy-btn-text">Kopiuj</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Legend for visual character categories -->
+        <div class="char-legend">
+          <span class="legend-item"><span class="legend-dot uppercase-dot"></span> Wielkie litery</span>
+          <span class="legend-item"><span class="legend-dot lowercase-dot"></span> Małe litery</span>
+          <span class="legend-item"><span class="legend-dot number-dot"></span> Cyfry</span>
+          <span class="legend-item"><span class="legend-dot symbol-dot"></span> Znaki specjalne</span>
+        </div>
+
+        <!-- Strength Meter Bar & Stats -->
+        <div class="strength-meter-section">
+          <div class="strength-info-header">
+            <div class="strength-status">
+              <span class="strength-label-text">Siła hasła:</span>
+              <span id="strength-text" class="strength-value strong">Mocne</span>
+            </div>
+            <div class="entropy-metric">
+              <span id="entropy-value">0</span> <span class="unit">bitów entropii</span>
+            </div>
+          </div>
+          
+          <div class="meter-bar-track">
+            <div id="meter-fill" class="meter-fill strength-level-3"></div>
+          </div>
+
+          <div class="security-insights">
+            <div class="insight-item">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+              <span>Szacowany czas na złamanie: <strong id="crack-time-estimate">120 milionów lat</strong></span>
+            </div>
+            <div class="insight-item" id="entropy-quality-item">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              </svg>
+              <span id="entropy-quality-text">Spełnia rygorystyczne normy NIST & OWASP</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Presets -->
+      <div class="presets-section">
+        <span class="section-title">Szybkie szablony (Presety)</span>
+        <div class="presets-grid">
+          <button type="button" class="preset-pill active" data-preset="ultra">
+            <span class="preset-emoji">🛡️</span> Ultra Bezpieczne (24 znaki)
+          </button>
+          <button type="button" class="preset-pill" data-preset="balanced">
+            <span class="preset-emoji">⚡</span> Zrównoważone (16 znaków)
+          </button>
+          <button type="button" class="preset-pill" data-preset="readable">
+            <span class="preset-emoji">👀</span> Bez mylących znaków (16)
+          </button>
+          <button type="button" class="preset-pill" data-preset="pin">
+            <span class="preset-emoji">🔢</span> Cyfrowy PIN (6)
+          </button>
+        </div>
+      </div>
+
+      <!-- Configuration Controls: Random Mode -->
+      <div id="random-controls" class="controls-panel">
+        <!-- Length Control -->
+        <div class="control-group length-group">
+          <div class="control-header">
+            <label for="length-slider" class="control-title">Długość hasła</label>
+            <div class="length-input-container">
+              <input type="number" id="length-number" min="6" max="64" value="20" aria-label="Wartość długości hasła">
+              <span class="length-unit">znaków</span>
+            </div>
+          </div>
+          <div class="slider-wrapper">
+            <input type="range" id="length-slider" min="6" max="64" value="20" class="custom-slider">
+            <div class="slider-ticks">
+              <span>6</span>
+              <span>16</span>
+              <span>24</span>
+              <span>32</span>
+              <span>48</span>
+              <span>64</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Character Selection Checkboxes -->
+        <div class="control-group">
+          <span class="control-title">Zawarte zbiory znaków</span>
+          <div class="switches-grid">
+            <!-- Uppercase -->
+            <label class="toggle-card" for="include-uppercase">
+              <div class="toggle-info">
+                <span class="toggle-title">Wielkie litery</span>
+                <span class="toggle-samples font-mono">A B C D E ... Z</span>
+              </div>
+              <div class="switch-container">
+                <input type="checkbox" id="include-uppercase" checked>
+                <span class="switch-slider"></span>
+              </div>
+            </label>
+
+            <!-- Lowercase -->
+            <label class="toggle-card" for="include-lowercase">
+              <div class="toggle-info">
+                <span class="toggle-title">Małe litery</span>
+                <span class="toggle-samples font-mono">a b c d e ... z</span>
+              </div>
+              <div class="switch-container">
+                <input type="checkbox" id="include-lowercase" checked>
+                <span class="switch-slider"></span>
+              </div>
+            </label>
+
+            <!-- Numbers -->
+            <label class="toggle-card" for="include-numbers">
+              <div class="toggle-info">
+                <span class="toggle-title">Cyfry</span>
+                <span class="toggle-samples font-mono">0 1 2 3 4 5 6 7 8 9</span>
+              </div>
+              <div class="switch-container">
+                <input type="checkbox" id="include-numbers" checked>
+                <span class="switch-slider"></span>
+              </div>
+            </label>
+
+            <!-- Special Symbols -->
+            <label class="toggle-card highlight-glow" for="include-symbols">
+              <div class="toggle-info">
+                <span class="toggle-title">Znaki specjalne</span>
+                <span class="toggle-samples font-mono">! @ # $ % ^ & * _ + - = ~ ?</span>
+              </div>
+              <div class="switch-container">
+                <input type="checkbox" id="include-symbols" checked>
+                <span class="switch-slider"></span>
+              </div>
+            </label>
+
+            <!-- Exclude Ambiguous Characters -->
+            <label class="toggle-card" for="exclude-ambiguous">
+              <div class="toggle-info">
+                <span class="toggle-title">Wyklucz mylące znaki</span>
+                <span class="toggle-samples font-mono">Unikaj: 1, l, I, 0, O, 8, B</span>
+              </div>
+              <div class="switch-container">
+                <input type="checkbox" id="exclude-ambiguous">
+                <span class="switch-slider"></span>
+              </div>
+            </label>
+
+            <!-- Guarantee all types -->
+            <label class="toggle-card" for="guarantee-all">
+              <div class="toggle-info">
+                <span class="toggle-title">Wymuś co najmniej jeden z każdego typu</span>
+                <span class="toggle-samples">Gwarancja spełnienia wymagań serwisów</span>
+              </div>
+              <div class="switch-container">
+                <input type="checkbox" id="guarantee-all" checked>
+                <span class="switch-slider"></span>
+              </div>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Configuration Controls: Passphrase Mode (Initially Hidden) -->
+      <div id="passphrase-controls" class="controls-panel hidden">
+        <div class="control-group">
+          <div class="control-header">
+            <label for="words-count-slider" class="control-title">Liczba słów w haśle</label>
+            <div class="length-input-container">
+              <span id="words-count-display" class="highlight-number">4</span>
+              <span class="length-unit">słowa</span>
+            </div>
+          </div>
+          <div class="slider-wrapper">
+            <input type="range" id="words-count-slider" min="3" max="8" value="4" class="custom-slider">
+            <div class="slider-ticks">
+              <span>3</span>
+              <span>4</span>
+              <span>5</span>
+              <span>6</span>
+              <span>7</span>
+              <span>8</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="switches-grid">
+          <div class="control-group select-group">
+            <label for="passphrase-separator" class="control-title">Separator słów</label>
+            <div class="custom-select-wrapper">
+              <select id="passphrase-separator" class="custom-select">
+                <option value="-">Myślnik (-)</option>
+                <option value=".">Kropka (.)</option>
+                <option value="_">Podkreślenie (_)</option>
+                <option value="!">Wykrzyknik (!)</option>
+                <option value="#">Kratka (#)</option>
+                <option value=" ">Spacja ( )</option>
+              </select>
+            </div>
+          </div>
+
+          <label class="toggle-card" for="passphrase-capitalize">
+            <div class="toggle-info">
+              <span class="toggle-title">Wielkie litery na początku słów</span>
+              <span class="toggle-samples">Np. Bateria-Pies-Planeta</span>
+            </div>
+            <div class="switch-container">
+              <input type="checkbox" id="passphrase-capitalize" checked>
+              <span class="switch-slider"></span>
+            </div>
+          </label>
+
+          <label class="toggle-card" for="passphrase-add-number">
+            <div class="toggle-info">
+              <span class="toggle-title">Dodaj losową cyfrę</span>
+              <span class="toggle-samples">Np. Bateria-Pies42-Planeta</span>
+            </div>
+            <div class="switch-container">
+              <input type="checkbox" id="passphrase-add-number" checked>
+              <span class="switch-slider"></span>
+            </div>
+          </label>
+
+          <label class="toggle-card highlight-glow" for="passphrase-add-symbol">
+            <div class="toggle-info">
+              <span class="toggle-title">Dodaj losowy znak specjalny</span>
+              <span class="toggle-samples">Np. Bateria-Pies$-Planeta</span>
+            </div>
+            <div class="switch-container">
+              <input type="checkbox" id="passphrase-add-symbol" checked>
+              <span class="switch-slider"></span>
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <div class="main-action-wrapper">
+        <button type="button" id="generate-main-btn" class="btn-generate-hero">
+          <span class="btn-glow"></span>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v19"></path>
+            <path d="M5 10l7-7 7 7"></path>
+          </svg>
+          Wygeneruj nowe hasło
+          <span class="btn-shortcut">Spacja</span>
+        </button>
+      </div>
+    </main>
+
+    <!-- History Drawer / Modal -->
+    <div id="history-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-title-wrap">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+              <path d="M3 3v5h5"></path>
+              <path d="M12 7v5l4 2"></path>
+            </svg>
+            <h3>Historia sesji</h3>
+          </div>
+          <div class="modal-header-actions">
+            <button type="button" id="clear-history-btn" class="btn-text-danger" title="Wyczyść całą historię">Wyczyść historię</button>
+            <button type="button" id="close-history-btn" class="modal-close-btn" aria-label="Zamknij historię">&times;</button>
+          </div>
+        </div>
+        <p class="modal-desc">Hasła są przechowywane wyłącznie w pamięci podręcznej bieżącej sesji Twojej przeglądarki.</p>
+        <div id="history-list" class="history-list">
+          <!-- Populated by JS -->
+          <div class="history-empty">Brak historii w bieżącej sesji.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Information Cards -->
+    <section class="security-info-grid">
+      <div class="info-card">
+        <div class="info-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <h4>Kryptograficzna losowość (CSPRNG)</h4>
+        <p>Aplikacja wykorzystuje <code>window.crypto.getRandomValues()</code> generujące losowość na poziomie sprzętowym, odporną na ataki statystyczne.</p>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </div>
+        <h4>Prywatność i brak telemetrii</h4>
+        <p>Żadne wygenerowane hasło ani parametr nie opuszczają Twojej przeglądarki. Całkowity brak zewnętrznych serwerów i śledzenia.</p>
+      </div>
+
+      <div class="info-card">
+        <div class="info-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+        </div>
+        <h4>Wszystkie klasy znaków</h4>
+        <p>Hasła zawierają pełne spektrum znaków specjalnych, cyfr, małych i wielkich liter z gwarancją ich wystąpienia.</p>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>KeyForge &copy; 2026 — Zaawansowany lokalny generator haseł. Opracowano z dbałością o estetykę i kryptograficzne standardy.</p>
+    </footer>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast hidden" role="status" aria-live="polite">
+    <div class="toast-icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+    </div>
+    <span id="toast-message">Hasło skopiowane do schowka!</span>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

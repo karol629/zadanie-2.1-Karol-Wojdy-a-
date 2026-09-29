@@ -1,0 +1,282 @@
+<Window x:Class="zadanie_2._1_karol_wojdyla.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:zadanie_2._1_karol_wojdyla"
+        mc:Ignorable="d"
+        Title="KeyForge — Zaawansowany Generator Haseł (C# .NET 9)"
+        Height="840" Width="740"
+        MinWidth="660" MinHeight="720"
+        WindowStartupLocation="CenterScreen"
+        Background="#070A12"
+        KeyDown="Window_KeyDown">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <Grid Margin="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" /> <!-- Header -->
+                <RowDefinition Height="Auto" /> <!-- Main Card -->
+                <RowDefinition Height="Auto" /> <!-- History Section -->
+                <RowDefinition Height="Auto" /> <!-- Footer -->
+            </Grid.RowDefinitions>
+
+            <!-- 1. Header -->
+            <StackPanel Grid.Row="0" Margin="0,0,0,20" HorizontalAlignment="Center">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,6">
+                    <Border Width="36" Height="36" CornerRadius="10" Margin="0,0,12,0">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#6366F1" Offset="0" />
+                                <GradientStop Color="#06B6D4" Offset="1" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <TextBlock Text="🛡️" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <TextBlock Text="KeyForge" FontSize="26" FontWeight="ExtraBold" Foreground="#FFFFFF" VerticalAlignment="Center" />
+                    <Border Background="#122B28" BorderBrush="#10B981" BorderThickness="1" CornerRadius="12" Margin="14,0,0,0" Padding="8,3" VerticalAlignment="Center">
+                        <TextBlock Text="C# CSPRNG (.NET 9)" FontSize="11" FontWeight="Bold" Foreground="#34D399" />
+                    </Border>
+                </StackPanel>
+                <TextBlock Text="Kryptograficznie bezpieczny generator haseł o wysokiej entropii"
+                           Foreground="{StaticResource TextMutedBrush}" FontSize="13" HorizontalAlignment="Center" />
+            </StackPanel>
+
+            <!-- 2. Main Generator Card -->
+            <Border Grid.Row="1" Background="{StaticResource BgCardBrush}"
+                    BorderBrush="{StaticResource BorderSubtleBrush}" BorderThickness="1"
+                    CornerRadius="16" Padding="24" Margin="0,0,0,16">
+                <StackPanel>
+                    <!-- Result Box Header -->
+                    <Grid Margin="0,0,0,10">
+                        <TextBlock Text="WYGENEROWANE HASŁO" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextDimBrush}" />
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button x:Name="ToggleVisibilityBtn" Content="👁️ Ukryj / Pokaż"
+                                    Style="{StaticResource SecondaryButton}" Padding="8,4" FontSize="11"
+                                    Click="ToggleVisibilityBtn_Click" Margin="0,0,6,0" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Password Display Box -->
+                    <Border Background="{StaticResource BgInputBrush}"
+                            BorderBrush="#25324D" BorderThickness="1.5"
+                            CornerRadius="10" Padding="14,12" Margin="0,0,0,14">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Password Text -->
+                            <TextBox x:Name="PasswordTextBox" Grid.Column="0"
+                                     Text="Kliknij Generuj..."
+                                     FontFamily="Consolas, Courier New"
+                                     FontSize="20" FontWeight="Bold"
+                                     Foreground="#38BDF8"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     IsReadOnly="True"
+                                     VerticalAlignment="Center"
+                                     TextWrapping="Wrap" />
+
+                            <!-- Refresh button -->
+                            <Button x:Name="RefreshBtn" Grid.Column="1"
+                                    Content="🔄"
+                                    Style="{StaticResource SecondaryButton}"
+                                    Width="44" Height="42"
+                                    Margin="10,0,6,0"
+                                    FontSize="16"
+                                    ToolTip="Generuj nowe hasło (Spacja)"
+                                    Click="RefreshBtn_Click" />
+
+                            <!-- Copy button -->
+                            <Button x:Name="CopyBtn" Grid.Column="2"
+                                    Content="📋 Kopiuj"
+                                    Style="{StaticResource ModernPrimaryButton}"
+                                    Height="42" Padding="16,0"
+                                    Click="CopyBtn_Click" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Copy confirmation toast -->
+                    <Border x:Name="CopyToastBorder" Background="#064E3B" BorderBrush="#10B981" BorderThickness="1"
+                            CornerRadius="6" Padding="10,6" Margin="0,0,0,12" Visibility="Collapsed" HorizontalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="✓ " FontWeight="Bold" Foreground="#34D399" />
+                            <TextBlock Text="Hasło zostało pomyślnie skopiowane do schowka!" Foreground="#A7F3D0" FontWeight="SemiBold" FontSize="12" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Password Strength Section -->
+                    <Border Background="#0F172A" BorderBrush="#1E293B" BorderThickness="1" CornerRadius="10" Padding="14" Margin="0,0,0,18">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,6">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Siła hasła: " Foreground="{StaticResource TextDimBrush}" FontSize="12" VerticalAlignment="Center" />
+                                    <TextBlock x:Name="StrengthLabel" Text="Bardzo silne" FontWeight="Bold" FontSize="13" Foreground="#10B981" VerticalAlignment="Center" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <TextBlock x:Name="EntropyLabel" Text="128" FontWeight="Bold" Foreground="#FFFFFF" FontSize="13" />
+                                    <TextBlock Text=" bitów entropii" Foreground="{StaticResource TextDimBrush}" FontSize="12" />
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Progress Bar -->
+                            <ProgressBar x:Name="StrengthProgressBar" Style="{StaticResource ModernProgressBar}"
+                                         Minimum="0" Maximum="100" Value="85" Foreground="#10B981" Margin="0,0,0,8" />
+
+                            <!-- Crack time estimate -->
+                            <TextBlock x:Name="CrackTimeLabel"
+                                       Text="🕒 Szacowany czas na złamanie: setki milionów lat"
+                                       Foreground="{StaticResource TextMutedBrush}" FontSize="12" />
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Presets -->
+                    <StackPanel Margin="0,0,0,18">
+                        <TextBlock Text="SZYBKIE SZABLONY (PRESETY)" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextDimBrush}" Margin="0,0,0,8" />
+                        <UniformGrid Columns="4">
+                            <Button Content="🛡️ Ultra (24)" Style="{StaticResource PresetButton}" Margin="0,0,4,0" Click="PresetUltra_Click" />
+                            <Button Content="⚡ Zrównoważone (16)" Style="{StaticResource PresetButton}" Margin="2,0,2,0" Click="PresetBalanced_Click" />
+                            <Button Content="👀 Czytelne (16)" Style="{StaticResource PresetButton}" Margin="2,0,2,0" Click="PresetReadable_Click" />
+                            <Button Content="🔢 PIN (6)" Style="{StaticResource PresetButton}" Margin="4,0,0,0" Click="PresetPin_Click" />
+                        </UniformGrid>
+                    </StackPanel>
+
+                    <!-- Length Slider -->
+                    <StackPanel Margin="0,0,0,18">
+                        <Grid Margin="0,0,0,8">
+                            <TextBlock Text="Długość hasła:" FontWeight="SemiBold" Foreground="{StaticResource TextMainBrush}" FontSize="13" />
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <TextBlock x:Name="LengthValueText" Text="20" FontWeight="Bold" Foreground="{StaticResource CyanAccentBrush}" FontSize="15" />
+                                <TextBlock Text=" znaków" Foreground="{StaticResource TextDimBrush}" FontSize="13" Margin="4,0,0,0" />
+                            </StackPanel>
+                        </Grid>
+                        <Slider x:Name="LengthSlider" Style="{StaticResource ModernSlider}"
+                                Minimum="6" Maximum="64" Value="20"
+                                SmallChange="1" LargeChange="4"
+                                IsSnapToTickEnabled="True" TickFrequency="1"
+                                ValueChanged="LengthSlider_ValueChanged" />
+                        <Grid Margin="2,4,2,0">
+                            <TextBlock Text="6" FontSize="10" Foreground="{StaticResource TextDimBrush}" HorizontalAlignment="Left" />
+                            <TextBlock Text="16" FontSize="10" Foreground="{StaticResource TextDimBrush}" HorizontalAlignment="Left" Margin="110,0,0,0" />
+                            <TextBlock Text="32" FontSize="10" Foreground="{StaticResource TextDimBrush}" HorizontalAlignment="Center" />
+                            <TextBlock Text="48" FontSize="10" Foreground="{StaticResource TextDimBrush}" HorizontalAlignment="Right" Margin="0,0,110,0" />
+                            <TextBlock Text="64" FontSize="10" Foreground="{StaticResource TextDimBrush}" HorizontalAlignment="Right" />
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Character Sets Options -->
+                    <StackPanel Margin="0,0,0,20">
+                        <TextBlock Text="ZBIORY ZNAKÓW I ZASADY" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextDimBrush}" Margin="0,0,0,10" />
+                        <UniformGrid Columns="2">
+                            <Border Background="#151D2F" CornerRadius="8" Padding="12,10" Margin="0,0,4,8">
+                                <CheckBox x:Name="UppercaseCheckBox" Style="{StaticResource ModernCheckBox}"
+                                          IsChecked="True" Checked="Option_Changed" Unchecked="Option_Changed">
+                                    <StackPanel>
+                                        <TextBlock Text="Wielkie litery (A-Z)" FontWeight="SemiBold" />
+                                        <TextBlock Text="A B C D E ... Z" FontSize="11" Foreground="{StaticResource TextDimBrush}" />
+                                    </StackPanel>
+                                </CheckBox>
+                            </Border>
+
+                            <Border Background="#151D2F" CornerRadius="8" Padding="12,10" Margin="4,0,0,8">
+                                <CheckBox x:Name="LowercaseCheckBox" Style="{StaticResource ModernCheckBox}"
+                                          IsChecked="True" Checked="Option_Changed" Unchecked="Option_Changed">
+                                    <StackPanel>
+                                        <TextBlock Text="Małe litery (a-z)" FontWeight="SemiBold" />
+                                        <TextBlock Text="a b c d e ... z" FontSize="11" Foreground="{StaticResource TextDimBrush}" />
+                                    </StackPanel>
+                                </CheckBox>
+                            </Border>
+
+                            <Border Background="#151D2F" CornerRadius="8" Padding="12,10" Margin="0,0,4,8">
+                                <CheckBox x:Name="NumbersCheckBox" Style="{StaticResource ModernCheckBox}"
+                                          IsChecked="True" Checked="Option_Changed" Unchecked="Option_Changed">
+                                    <StackPanel>
+                                        <TextBlock Text="Cyfry (0-9)" FontWeight="SemiBold" />
+                                        <TextBlock Text="0 1 2 3 4 5 6 7 8 9" FontSize="11" Foreground="{StaticResource TextDimBrush}" />
+                                    </StackPanel>
+                                </CheckBox>
+                            </Border>
+
+                            <Border Background="#1C182F" BorderBrush="#4C1D95" BorderThickness="1" CornerRadius="8" Padding="12,10" Margin="4,0,0,8">
+                                <CheckBox x:Name="SymbolsCheckBox" Style="{StaticResource ModernCheckBox}"
+                                          IsChecked="True" Checked="Option_Changed" Unchecked="Option_Changed">
+                                    <StackPanel>
+                                        <TextBlock Text="Znaki specjalne" FontWeight="SemiBold" Foreground="#F472B6" />
+                                        <TextBlock Text="! @ # $ % ^ &amp; * _ + - = ~ ?" FontSize="11" Foreground="{StaticResource TextDimBrush}" />
+                                    </StackPanel>
+                                </CheckBox>
+                            </Border>
+
+                            <Border Background="#151D2F" CornerRadius="8" Padding="12,10" Margin="0,0,4,0">
+                                <CheckBox x:Name="ExcludeAmbiguousCheckBox" Style="{StaticResource ModernCheckBox}"
+                                          IsChecked="False" Checked="Option_Changed" Unchecked="Option_Changed">
+                                    <StackPanel>
+                                        <TextBlock Text="Wyklucz mylące znaki" FontWeight="SemiBold" />
+                                        <TextBlock Text="Unikaj: 1, l, I, 0, O, 8, B" FontSize="11" Foreground="{StaticResource TextDimBrush}" />
+                                    </StackPanel>
+                                </CheckBox>
+                            </Border>
+
+                            <Border Background="#151D2F" CornerRadius="8" Padding="12,10" Margin="4,0,0,0">
+                                <CheckBox x:Name="GuaranteeAllCheckBox" Style="{StaticResource ModernCheckBox}"
+                                          IsChecked="True" Checked="Option_Changed" Unchecked="Option_Changed">
+                                    <StackPanel>
+                                        <TextBlock Text="Gwarantuj każdy typ" FontWeight="SemiBold" />
+                                        <TextBlock Text="Min. 1 wielka, cyfra, symbol" FontSize="11" Foreground="{StaticResource TextDimBrush}" />
+                                    </StackPanel>
+                                </CheckBox>
+                            </Border>
+                        </UniformGrid>
+                    </StackPanel>
+
+                    <!-- Big Action Generate Button -->
+                    <Button x:Name="MainGenerateBtn"
+                            Content="⚡ WYGENERUJ NOWE HASŁO (Spacja)"
+                            Style="{StaticResource ModernPrimaryButton}"
+                            Height="48" FontSize="15"
+                            Click="MainGenerateBtn_Click" />
+                </StackPanel>
+            </Border>
+
+            <!-- 3. Session History Expander -->
+            <Expander Grid.Row="2" Margin="0,0,0,16"
+                      Background="{StaticResource BgCardBrush}"
+                      BorderBrush="{StaticResource BorderSubtleBrush}"
+                      Foreground="{StaticResource TextMutedBrush}">
+                <Expander.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="📜 Ostatnio wygenerowane hasła w sesji (" FontWeight="SemiBold" Foreground="{StaticResource TextMainBrush}" />
+                        <TextBlock x:Name="HistoryCountLabel" Text="0" FontWeight="Bold" Foreground="{StaticResource CyanAccentBrush}" />
+                        <TextBlock Text=")" FontWeight="SemiBold" Foreground="{StaticResource TextMainBrush}" />
+                    </StackPanel>
+                </Expander.Header>
+                <Border Padding="16">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,0,8">
+                            <Button x:Name="ClearHistoryBtn" Content="Wyczyść historię"
+                                    Style="{StaticResource SecondaryButton}" Padding="10,4" FontSize="11"
+                                    Click="ClearHistoryBtn_Click" />
+                        </StackPanel>
+                        <ListBox x:Name="HistoryListBox"
+                                 Background="#0B1120" BorderBrush="#1E293B" BorderThickness="1"
+                                 Foreground="#FFFFFF" FontFamily="Consolas" FontSize="13"
+                                 MaxHeight="160"
+                                 SelectionChanged="HistoryListBox_SelectionChanged" />
+                        <TextBlock Text="Wskazówka: Kliknij dwukrotnie lub wybierz hasło z listy, aby skopiować je do schowka."
+                                   FontSize="11" Foreground="{StaticResource TextDimBrush}" Margin="0,6,0,0" />
+                    </StackPanel>
+                </Border>
+            </Expander>
+
+            <!-- 4. Footer -->
+            <TextBlock Grid.Row="3"
+                       Text="KeyForge © 2026 — Projekt w C# (.NET 9 WPF) z kryptograficznym generatorem CSPRNG"
+                       Foreground="{StaticResource TextDimBrush}" FontSize="11"
+                       HorizontalAlignment="Center" Margin="0,6,0,0" />
+        </Grid>
+    </ScrollViewer>
+</Window>
